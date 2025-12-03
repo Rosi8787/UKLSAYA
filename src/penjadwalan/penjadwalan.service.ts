@@ -33,16 +33,19 @@ export class PenjadwalanService {
     }
 
     // 4. Buat jadwal
-    const create = await this.prisma.penjadwalan.create({
-      data: {
-        hari,
-        jam_mulai,
-        jam_selesai,
-        ruang,
-        dosenNidn,
-        matakuliahId,
-      },
-    });
+   const create = await this.prisma.penjadwalan.create({
+  data: {
+    hari,
+    jam_mulai,
+    jam_selesai,
+    ruang,
+    dosenNidn,
+    matakuliahId,
+    semester: dto.semester,
+    tahunAjaran: dto.tahunAjaran,
+  },
+});
+
 
     return {
       status: 'success',
@@ -90,9 +93,19 @@ export class PenjadwalanService {
     if (!mk) throw new NotFoundException('Matakuliah tidak ditemukan');
 
     const update = await this.prisma.penjadwalan.update({
-      where: { id },
-      data: dto,
-    });
+  where: { id },
+  data: {
+    hari: dto.hari,
+    jam_mulai: dto.jam_mulai,
+    jam_selesai: dto.jam_selesai,
+    ruang: dto.ruang,
+    dosenNidn: dto.dosenNidn,
+    matakuliahId: dto.matakuliahId,
+    semester: dto.semester,
+    tahunAjaran: dto.tahunAjaran,
+  },
+});
+
 
     return {
       status: 'success',

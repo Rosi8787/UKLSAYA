@@ -7,38 +7,40 @@ export class MatakuliahService {
   constructor(private prisma: PrismaService) {}
 
   // CREATE
-  async create(data: MatakuliahDto) {
-    try {
-      const matakuliah = await this.prisma.matakuliah.create({
-        data: {
-          nama_matakuliah: data.nama_matakuliah,
-          sks: data.sks,
-          id_dosen: data.id_dosen, // ← PENTING! harus string
-        },
-        include: {
-          dosen: true,
-        },
-      });
+ async create(data: MatakuliahDto) {
+  try {
+    const matakuliah = await this.prisma.matakuliah.create({
+      data: {
+        nama_matakuliah: data.nama_matakuliah,
+        sks: data.sks,
+        id_dosen: data.id_dosen,
+      },
+      include: { dosen: true },
+    });
 
-      return {
-        status: "success",
-        message: "Matakuliah added successfully",
-        data: {
-          id_matakuliah: matakuliah.id_matakuliah,
-          nama_matakuliah: matakuliah.nama_matakuliah,
-          id_dosen: matakuliah.id_dosen,
-          sks: matakuliah.sks,
-        },
-      };
-    } catch (error) {
+    return {
+      status: "success",
+      message: "Matakuliah added successfully",
+      data: matakuliah,
+    };
+
+  } catch (error) {
+
+    if (error.code === 'P2002') {
       return {
         status: "error",
-        message: "Failed to add matakuliah",
-        error: error.message,
-        data: null,
+        message: "Matakuliah sudah ada (duplikat)",
+        meta: error.meta,
       };
     }
+
+    return {
+      status: "error",
+      message: "Failed to add matakuliah",
+      error: error.message,
+    };
   }
+}
 
   // READ ALL
   async findAll() {
@@ -50,8 +52,8 @@ export class MatakuliahService {
 
     return {
       status: true,
-      message: "Data seluruh matakuliah",
-      data: list.map(m => ({
+      message: 'Data seluruh matakuliah',
+      data: list.map((m) => ({
         id_matakuliah: m.id_matakuliah,
         nama_matakuliah: m.nama_matakuliah,
         id_dosen: m.id_dosen,
@@ -68,7 +70,7 @@ export class MatakuliahService {
         where: { id_matakuliah },
       });
 
-      if (!exists) throw new NotFoundException("Matakuliah tidak ditemukan");
+      if (!exists) throw new NotFoundException('Matakuliah tidak ditemukan');
 
       const updated = await this.prisma.matakuliah.update({
         where: { id_matakuliah },
@@ -81,13 +83,13 @@ export class MatakuliahService {
 
       return {
         status: true,
-        message: "Matakuliah berhasil diupdate",
+        message: 'Matakuliah berhasil diupdate',
         data: updated,
       };
     } catch (error) {
       return {
         status: false,
-        message: "Gagal update matakuliah",
+        message: 'Gagal update matakuliah',
         error: error.message,
         data: null,
       };
@@ -103,13 +105,13 @@ export class MatakuliahService {
 
       return {
         status: true,
-        message: "Matakuliah berhasil dihapus",
+        message: 'Matakuliah berhasil dihapus',
         data: null,
       };
     } catch (error) {
       return {
         status: false,
-        message: "Gagal menghapus matakuliah",
+        message: 'Gagal menghapus matakuliah',
         error: error.message,
         data: null,
       };

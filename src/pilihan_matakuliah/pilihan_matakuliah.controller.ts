@@ -5,7 +5,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 
-@Controller('pilihan')
+@Controller('api/mahasiswa')
 export class PilihanMatakuliahController {
   constructor(private service: PilihanMatakuliahService) {}
 
@@ -17,11 +17,25 @@ export class PilihanMatakuliahController {
 //   return this.pilihMatakuliah(dto);
 // }
 
-@Post()
+@Post('pilih-matakuliah')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('MAHASISWA','ADMIN')
 async pilihMatakuliah(@Body() dto: PilihMatakuliahDto) {
   return this.service.pilihMatakuliah(dto);
+}
+
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @Roles('MAHASISWA','ADMIN')
+// @Get('jadwal/:mahasiswa_id')
+// async lihatJadwal(@Param('mahasiswa_id') mahasiswa_id: number) {
+//   return this.service.lihatJadwal(Number(mahasiswa_id));
+// }
+
+@Post('jadwal')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('MAHASISWA','ADMIN')
+async lihatJadwal(@Body('mahasiswa_id') mahasiswa_id: number) {
+  return this.service.lihatJadwal(mahasiswa_id);
 }
 
 

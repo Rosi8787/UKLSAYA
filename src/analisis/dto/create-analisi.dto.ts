@@ -1,15 +1,19 @@
-import { IsOptional, IsString, IsInt } from "class-validator";
+import { IsOptional, IsString, IsInt } from 'class-validator';
 
 export class CreateAnalisiDto {
   @IsString()
-  @IsOptional() 
-  tahun_ajaran?: string; // contoh: "2025/2026"
+  @IsOptional()
+  tahun_ajaran?: string;
 
   @IsInt()
   @IsOptional()
-  semester?: number; // contoh: 1 atau 2
+  semester?: number;
 
   @IsInt()
   @IsOptional()
-  limit?: number; // optional, default 10
+  page?: number; // halaman
+
+  @IsInt()
+  @IsOptional()
+  limit?: number; // jumlah data per halaman
 }
