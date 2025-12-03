@@ -1,0 +1,195 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  // url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  role     Role
+
+  mahasiswa Mahasiswa?
+  dosen     Dosen?
+}
+
+model Mahasiswa {
+  id            Int    @id @default(autoincrement())
+  nim           String @unique
+  nama          String
+  jenis_kelamin gender
+  jurusan       String
+
+  userId Int?  @unique
+  user   User? @relation(fields: [userId], references: [id])
+
+  pilihan             MahasiswaMatakuliah[]
+  PemilihanMatakuliah PemilihanMatakuliah[]
+}
+
+model Dosen {
+  nidn          String @id
+  nama          String
+  jenis_kelamin gender
+  alamat        String
+
+  userId Int?  @unique
+  user   User? @relation(fields: [userId], references: [id])
+
+  // relasi balik ke Matakuliah
+  mengajar Matakuliah[] @relation("DosenMengajar")
+
+  Penjadwalan Penjadwalan[]
+}
+
+model Matakuliah {
+  id_matakuliah   Int    @id @default(autoincrement())
+  nama_matakuliah String
+  id_dosen        String
+  sks             Int
+
+  // relasi ke dosen
+  dosen Dosen @relation("DosenMengajar", fields: [id_dosen], references: [nidn])
+
+  jadwal              Penjadwalan[]
+  dipilih             MahasiswaMatakuliah[]
+  PemilihanMatakuliah PemilihanMatakuliah[]
+}
+
+model Penjadwalan {
+  id          Int    @id @default(autoincrement())
+  hari        String
+  jam_mulai   String
+  jam_selesai String
+  ruang       String
+
+  dosenNidn    String
+  matakuliahId Int
+
+  dosen      Dosen      @relation(fields: [dosenNidn], references: [nidn])
+  matakuliah Matakuliah @relation(fields: [matakuliahId], references: [id_matakuliah])
+}
+
+model MahasiswaMatakuliah {
+  id           Int    @id @default(autoincrement())
+  mahasiswaNim String
+  matakuliahId Int
+
+  mahasiswa  Mahasiswa  @relation(fields: [mahasiswaNim], references: [nim])
+  matakuliah Matakuliah @relation(fields: [matakuliahId], references: [id_matakuliah])
+}
+
+model PemilihanMatakuliah {
+  id           Int      @id @default(autoincrement())
+  mahasiswaNim String
+  matakuliahId Int
+  createdAt    DateTime @default(now())
+
+  mahasiswa  Mahasiswa  @relation(fields: [mahasiswaNim], references: [nim])
+  matakuliah Matakuliah @relation(fields: [matakuliahId], references: [id_matakuliah])
+
+  @@index([mahasiswaNim])
+  @@index([matakuliahId])
+}
+
+enum Role {
+  ADMIN
+  MAHASISWA
+  DOSEN
+}
+
+enum gender {
+  pria
+  wanita
+}
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+// }
+
+// model User {
+//   id       Int    @id @default(autoincrement())
+//   email    String @unique
+//   password String
+//   role     Role
+
+//   mahasiswa Mahasiswa?
+//   dosen      Dosen?
+//   // mahasiswa Mahasiswa[] // one user bisa punya banyak mahasiswa (AMAN)
+// }
+
+// model Mahasiswa {
+//   id            Int      @id @default(autoincrement())
+//   nim           String   @unique
+//   nama          String
+//   jenis_kelamin gender
+//   jurusan       String
+
+//   userId        Int? @unique
+//   user          User? @relation(fields: [userId], references: [id])
+// }
+
+// model Dosen {
+//   nidn          String @id
+//   nama          String
+//   jenis_kelamin gender
+//   alamat        String
+
+//   userId        Int? @unique
+//   user          User? @relation(fields: [userId], references: [id])
+// }
+
+// model Matakuliah {
+//   id_matakuliah   Int    @id @default(autoincrement())
+//   nama_matakuliah String
+//   id_dosen        String // harus String agar sama dengan nidn
+//   sks             Int
+
+//   dosen Dosen @relation("DosenMengajar", fields: [id_dosen], references: [nidn])
+
+//   jadwal  Penjadwalan[]
+//   dipilih MahasiswaMatakuliah[]
+// }
+
+// model Penjadwalan {
+//   id          Int    @id @default(autoincrement())
+//   hari        String
+//   jam_mulai   String
+//   jam_selesai String
+//   ruang       String
+
+//   dosenNidn    String
+//   matakuliahId Int
+
+//   dosen      Dosen      @relation(fields: [dosenNidn], references: [nidn])
+//   matakuliah Matakuliah @relation(fields: [matakuliahId], references: [id_matakuliah])
+// }
+
+// model MahasiswaMatakuliah {
+//   id           Int    @id @default(autoincrement())
+//   mahasiswaNim String
+//   matakuliahId Int
+
+//   mahasiswa  Mahasiswa  @relation(fields: [mahasiswaNim], references: [nim])
+//   matakuliah Matakuliah @relation(fields: [matakuliahId], references: [id_matakuliah])
+// }
+
+// enum Role {
+//   ADMIN
+//   MAHASISWA
+//   DOSEN
+// }
+
+// enum gender {
+//   pria
+//   wanita
+// }
